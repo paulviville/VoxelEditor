@@ -15,10 +15,9 @@ export class VoxelViewer {
 	
 	constructor(nbLoDs = 1) {
 		this.#nbLoDs = nbLoDs;
-		this.#totalCellNb = Math.pow(Math.pow(DIVS, 3), nbLoDs - 1);
-        
+		this.#totalCellNb = Math.pow(Math.pow(DIVS, 3), nbLoDs );
+		// console.log("total cells", this.#totalCellNb)
         const geometry = new THREE.BoxGeometry(1, 1, 1);
-        console.log(geometry.attributes.position)
         for(let i = 0; i < 72; ++i) {
             geometry.attributes.position.array[i] += 0.5
         }
@@ -33,7 +32,7 @@ export class VoxelViewer {
         const scale = new THREE.Vector3(size, size, size);
 		for(let i = 0; i < this.#totalCellNb; ++i) {
 			matrix.compose(position, rotation, scale);
-			matrix.toArray(this.#instanceMatrix, i*16);
+			// matrix.toArray(this.#instanceMatrix, i*16);
             this.#mesh.setMatrixAt(i, matrix)
 		}
 
@@ -50,15 +49,16 @@ export class VoxelViewer {
 	}
 
 	#voxelId(cell, lod) {
-		return cell.x + Math.pow(4, lod) * cell.y + Math.pow(Math.pow(4, lod), 2) * cell.z;
+		return cell.x + Math.pow(4, lod+1) * cell.y + Math.pow(Math.pow(4, lod+1), 2) * cell.z;
 	}
 
 	showCell(lod = 0, cell = new THREE.Vector3(0, 0, 0)) {
 		const id = this.#voxelId(cell, lod);
-
+		// console.log(id, cell)
    		const rotation = new THREE.Quaternion();
 
 		const size = SIZE / Math.pow(4, lod);
+		const size1 = SIZE / Math.pow(4, lod + 1);
 		const scale = new THREE.Vector3(size, size, size);
 
 		const position = new THREE.Vector3(
@@ -73,7 +73,7 @@ export class VoxelViewer {
 		const matrix = new THREE.Matrix4();
 		matrix.compose(position, rotation, scale);
         
-        console.log(id, matrix)
+        // console.log(id, matrix)
         this.#mesh.setMatrixAt(matId, matrix)
 
 		this.#mesh.instanceMatrix.needsUpdate = true
@@ -82,17 +82,17 @@ export class VoxelViewer {
 	update() {
 		this.#mesh.instanceMatrix.needsUpdate = true
 		this.#mesh.count = this.#visibleCells.length;
-		console.log(this.#visibleCells.length)
+		// console.log(this.#visibleCells.length)
 	}
 
 	hideCell( cell = new THREE.Vector3(0, 0, 0)) {
 		// const offset = this.#lodOffsets[lod];
-		const id = this.#voxelId(cell, lod);
-		const matrix = new THREE.Matrix4().multiplyScalar(0);
-        this.#mesh.setMatrixAt(i, matrix)
+		// const id = this.#voxelId(cell, lod);
+		// const matrix = new THREE.Matrix4().multiplyScalar(0);
+        // this.#mesh.setMatrixAt(i, matrix)
 		
 
-		this.#mesh.instanceMatrix.needsUpdate = true
+		// this.#mesh.instanceMatrix.needsUpdate = true
 	}
 
 	reset() {

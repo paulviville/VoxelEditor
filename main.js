@@ -64,14 +64,12 @@ gridManager.addTo(scene)
 
 
 const voxelHandler = new VoxelHandler(maxLoD);
-// voxelHandler.addVoxel({x: 43, y:37, z:25});
-// voxelHandler.addVoxel({x: 13, y:37, z:25});
-// voxelHandler.addVoxel({x: 47, y:17, z:25});
-// voxelHandler.addVoxel({x: 43, y:30, z:25});
-// voxelHandler.addVoxel({x: 43, y:37, z:5});
-// voxelHandler.addVoxel({x: 20, y:7, z:12});
-
-for(let i = 0; i < 20; ++i) {
+voxelHandler.addVoxel({
+  x:47,
+  y:48,
+  z:48
+});
+for(let i = 0; i < 0; ++i) {
   voxelHandler.addVoxel({
     x: ~~(Math.random() * 64),
     y: ~~(Math.random() * 64),
@@ -83,9 +81,12 @@ for(let i = 0; i < 20; ++i) {
 const voxelViewer = new VoxelViewer(maxLoD);
 voxelViewer.addTo(scene);
 
+voxelHandler.setVoxelViewer(voxelViewer);
+voxelHandler.setGrid(gridManager);
 
-voxelHandler.viewBricks(gridManager);
-voxelHandler.viewVoxel(voxelViewer);
+
+voxelHandler.viewBricks();
+voxelHandler.viewVoxel();
 
 function updateRay(pId, pos) {
   
@@ -140,7 +141,12 @@ scene.add(inter1)
 function recompute() {
   if(requiresUpdate) {
     gridManager.reset()
-    initiateMarch(ray);
+    const ray2 = {
+      direction: ray.direction.clone().normalize(),
+      origin: ray.origin.clone().divideScalar(4)
+    }
+    voxelHandler.traverse(ray2);
+  // initiateMarch(ray);
     gridManager.update();
     requiresUpdate = false;
   }
@@ -361,6 +367,15 @@ function onPointerDown(event) {
   updateRay(0, ray.origin);
   updateRay(1, ray.at(20, ray.origin.clone()));
   requiresUpdate = true;
+
+
+  const ray2 = {
+    direction: ray.direction.clone().normalize(),
+    origin: ray.origin.clone().divideScalar(4)
+  }
+
+  // console.log(ray2);
+
 }
 
 document.addEventListener( 'pointerdown', onPointerDown );
